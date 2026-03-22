@@ -10,17 +10,17 @@ class CommunityPage extends StatelessWidget {
     return Stack(
       children: [
         SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 80.0),
+          padding: const EdgeInsets.only(top: 10.0, bottom: 90.0), // Extra bottom padding for FAB
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Community Categories
+              // Header Section
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
                   'Communities',
                   style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 22.0,
                     fontWeight: FontWeight.bold,
                     color: AppColors.darkText,
                   ),
@@ -29,18 +29,20 @@ class CommunityPage extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  'Find your people',
+                  'Find your people and share anonymously',
                   style: TextStyle(
                     fontSize: 16.0,
                     color: AppColors.greyText,
                   ),
                 ),
               ),
-              const SizedBox(height: 16.0),
-              _buildCommunityCategoryList(),
+              const SizedBox(height: 20.0),
+
+              // Community Categories
+              _buildCommunityCategoryList(context),
               const SizedBox(height: 30.0),
 
-              // Recent Posts
+              // Recent Posts Section
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
@@ -57,44 +59,51 @@ class CommunityPage extends StatelessWidget {
             ],
           ),
         ),
-        // Floating Action Button
+
+        // Floating Action Button for New Posts
         Positioned(
           bottom: 20,
           right: 20,
           child: FloatingActionButton(
             onPressed: () {
-              // Handle creating a new post
+              // This should navigate to your CreatePostScreen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Opening Anonymous Post Editor...')),
+              );
             },
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
+            elevation: 4,
             shape: const CircleBorder(),
-            child: const Icon(Icons.add),
+            child: const Icon(Icons.add, size: 30),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCommunityCategoryList() {
+  Widget _buildCommunityCategoryList(BuildContext context) {
     final List<Map<String, dynamic>> categories = [
-      {'title': 'Relationship Issues', 'members': 42},
-      {'title': 'Financial Stress', 'members': 28},
-      {'title': 'Abuse Support', 'members': 18},
-      {'title': 'Anxiety & Depression', 'members': 38},
+      {'title': 'Relationship Issues', 'members': 42, 'icon': Icons.favorite_outline},
+      {'title': 'Financial Stress', 'members': 28, 'icon': Icons.payments_outlined},
+      {'title': 'Abuse Support', 'members': 18, 'icon': Icons.shield_outlined},
+      {'title': 'Anxiety & Depression', 'members': 38, 'icon': Icons.psychology_outlined},
     ];
 
     return Column(
       children: [
-        ...categories.map((category) => _buildCategoryCard(category)),
+        // Map categories to clickable cards
+        ...categories.map((category) => _buildCategoryCard(context, category)),
+        
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () {
-                // Navigate to all communities view
-              },
-              child: const Text('View All Communities', style: TextStyle(color: AppColors.primary)),
+            child: TextButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.explore_outlined, size: 18),
+              label: const Text('View All Communities'),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ),
         ),
@@ -102,21 +111,38 @@ class CommunityPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(Map<String, dynamic> category) {
+  Widget _buildCategoryCard(BuildContext context, Map<String, dynamic> category) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+      elevation: 0,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+      ),
       child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.secondary.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(category['icon'], color: AppColors.primary, size: 20),
+        ),
         title: Text(
           category['title'],
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.darkText),
         ),
         subtitle: Text(
-          '${category['members']} members',
-          style: const TextStyle(color: AppColors.greyText),
+          '${category['members']} members active',
+          style: const TextStyle(color: AppColors.greyText, fontSize: 13),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16.0, color: AppColors.greyText),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14.0, color: AppColors.greyText),
         onTap: () {
-          // Navigate to community detail page
+          // Navigate to specific community thread
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Entering ${category['title']} community')),
+          );
         },
       ),
     );
@@ -127,26 +153,16 @@ class CommunityPage extends StatelessWidget {
       {
         'community': 'Anxiety & Depression',
         'time': '2h ago',
-        'content':
-        'Finally managed to go outside today after weeks of struggling. Small steps matter. I\'ve been dealing with agoraphobia and today was a breakthrough.',
+        'content': 'Finally managed to go outside today after weeks of struggling. Small steps matter.',
         'likes': 24,
         'comments': 8,
       },
       {
         'community': 'Relationship Issues',
         'time': '5h ago',
-        'content':
-        'Had an honest conversation with my friend about boundaries. It was hard but necessary.',
+        'content': 'Had an honest conversation with my friend about boundaries. It was hard but necessary.',
         'likes': 18,
         'comments': 5,
-      },
-      {
-        'community': 'Work & Career',
-        'time': '1d ago',
-        'content':
-        'Work has been overwhelming, but I\'m learning to take breaks without feeling guilty.',
-        'likes': 32,
-        'comments': 12,
       },
     ];
 
@@ -157,12 +173,15 @@ class CommunityPage extends StatelessWidget {
 
   Widget _buildPostCard(BuildContext context, Map<String, dynamic> post) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      elevation: 0,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () {
           Navigator.of(context).pushNamed(PostDetailScreen.routeName, arguments: post);
         },
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(20.0),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -173,32 +192,44 @@ class CommunityPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text('AN', style: TextStyle(color: AppColors.darkText, fontWeight: FontWeight.bold)), // Anonymous Avatar
+                      const CircleAvatar(
+                        radius: 12,
+                        backgroundColor: AppColors.secondary,
+                        child: Text('?', style: TextStyle(fontSize: 10, color: AppColors.primary)),
+                      ),
                       const SizedBox(width: 8.0),
-                      Text(post['community'], style: const TextStyle(color: AppColors.primary, fontSize: 13)),
+                      Text(post['community'], 
+                        style: const TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  Text(post['time'], style: const TextStyle(color: AppColors.greyText, fontSize: 13)),
+                  Text(post['time'], style: const TextStyle(color: AppColors.greyText, fontSize: 12)),
                 ],
               ),
-              const SizedBox(height: 8.0),
-              Text(post['content'], style: const TextStyle(fontSize: 15)),
               const SizedBox(height: 12.0),
+              Text(post['content'], 
+                style: const TextStyle(fontSize: 15, color: AppColors.darkText, height: 1.4)),
+              const SizedBox(height: 16.0),
               Row(
                 children: [
-                  const Icon(Icons.favorite_border, size: 18, color: AppColors.greyText),
-                  const SizedBox(width: 4.0),
-                  Text('${post['likes']}', style: const TextStyle(color: AppColors.greyText)),
+                  _buildPostStat(Icons.favorite_border, '${post['likes']}'),
                   const SizedBox(width: 20.0),
-                  const Icon(Icons.comment_outlined, size: 18, color: AppColors.greyText),
-                  const SizedBox(width: 4.0),
-                  Text('${post['comments']}', style: const TextStyle(color: AppColors.greyText)),
+                  _buildPostStat(Icons.mode_comment_outlined, '${post['comments']}'),
                 ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPostStat(IconData icon, String count) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.greyText),
+        const SizedBox(width: 4.0),
+        Text(count, style: const TextStyle(color: AppColors.greyText, fontSize: 13)),
+      ],
     );
   }
 }

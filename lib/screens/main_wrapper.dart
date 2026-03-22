@@ -51,35 +51,20 @@ class _MainWrapperState extends State<MainWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
+    
+       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.greyText,
-        onTap: _onItemTapped,
+        showUnselectedLabels: true,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.android), // AI Companion/Chat Icon
-            label: "AI Chat",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            label: "Community",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined), // Journal Icon
-            label: "Journal",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.phone_in_talk_outlined,
-            ), // Help/Professional Help Icon
-            label: "Help",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Chatbot'),
+          BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Community'),
+          BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'Daily Insights'),
+          BottomNavigationBarItem(icon: Icon(Icons.help_outline), label: 'Help'),
         ],
       ),
     );

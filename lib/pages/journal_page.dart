@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:samvaad/utils/app_colors.dart';
-import 'package:samvaad/pages/dashboard_page.dart'; // Reusing MoodPill from dashboard
 
 class JournalPage extends StatefulWidget {
   static const String routeName = '/journal-entry';
@@ -21,8 +20,6 @@ class _JournalPageState extends State<JournalPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const SizedBox(height: 10.0),
-
-          // Journal Prompt
           const Text(
             'How was your day?',
             style: TextStyle(
@@ -32,22 +29,20 @@ class _JournalPageState extends State<JournalPage> {
             ),
           ),
           const SizedBox(height: 16.0),
-
-          // Text Area for Journaling
           TextFormField(
-            maxLines: 10,
+            maxLines: 8,
             minLines: 5,
-            decoration: const InputDecoration(
-              hintText:
-                  'Write about your thoughts, feelings, or anything on your mind...',
+            decoration: InputDecoration(
+              hintText: 'Write about your thoughts, feelings, or anything on your mind...',
               filled: true,
-              fillColor: AppColors.white,
-              alignLabelWithHint: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
           const SizedBox(height: 40.0),
-
-          // Mood Tracker Section
           const Text(
             'How are you feeling?',
             style: TextStyle(
@@ -56,82 +51,93 @@ class _JournalPageState extends State<JournalPage> {
               color: AppColors.darkText,
             ),
           ),
-          const SizedBox(height: 16.0),
-
-          // Mood Selection
-          _buildMoodSelectionRow(),
+          const SizedBox(height: 20.0),
+          _buildMoodSelection(),
           const SizedBox(height: 40.0),
-
-          // Save Entry Button
           ElevatedButton(
             onPressed: () {
-              // Handle saving the journal entry
+              if (_selectedMood == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please select a mood first')),
+                );
+                return;
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Journal Entry Saved!')),
               );
             },
-            child: const Text('Save Entry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 55),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text('Save Entry', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMoodSelectionRow() {
-    final List<Map<String, dynamic>> moods = [
-      {'label': 'Happy', 'emoji': '😊', 'color': AppColors.happy},
-      {'label': 'Calm', 'emoji': '😌', 'color': AppColors.calm},
-      {'label': 'Sad', 'emoji': '😥', 'color': AppColors.sad},
-      {'label': 'Anxious', 'emoji': '😟', 'color': AppColors.anxious},
-    ];
+ Widget _buildMoodSelection() {
+  final List<Map<String, dynamic>> moods = [
+    {'label': 'Happy', 'image': 'assets/images/smile.jpeg', 'color': AppColors.happy},
+    {'label': 'Calm', 'image': 'assets/images/cry.jpeg', 'color': AppColors.calm},
+    {'label': 'Sad', 'image': 'assets/images/sad.jpeg', 'color': AppColors.sad},
+    {'label': 'Anxious', 'image': 'assets/images/angry.jpeg', 'color': AppColors.anxious},
+  ];
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children:
-          moods.map((mood) {
-            bool isSelected = _selectedMood == mood['label'];
-            return InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedMood = mood['label'];
-                });
-              },
-              borderRadius: BorderRadius.circular(12.0),
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: moods.map((mood) {
+      bool isSelected = _selectedMood == mood['label'];
+      return GestureDetector(
+        onTap: () => setState(() => _selectedMood = mood['label'] as String),
+        child: Column(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 70,
+              height: 70,
+              padding: EdgeInsets.all(isSelected ? 3 : 0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? mood['color'] as Color : Colors.transparent,
+                  width: 3,
+                ),
+              ),
               child: Container(
-                padding: const EdgeInsets.all(8.0),
-                // Update _buildMoodSelectionRow decoration
                 decoration: BoxDecoration(
-                  color: isSelected ? mood['color'] : AppColors.white,
-                  borderRadius: BorderRadius.circular(
-                    20.0,
-                  ), // More rounded like the image
+                  shape: BoxShape.circle,
+                  // REMOVED 'const' from here because withValues is dynamic
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
-                ),
-                child: Column(
-                  children: [
-                    Text(mood['emoji'], style: const TextStyle(fontSize: 32.0)),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      mood['label'],
-                      style: TextStyle(
-                        fontSize: 14,
-                        color:
-                            isSelected ? AppColors.primary : AppColors.darkText,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  image: DecorationImage(
+                    image: AssetImage(mood['image'] as String),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            );
-          }).toList(),
-    );
-  }
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              mood['label'] as String,
+              style: TextStyle(
+                fontSize: 13,
+                color: isSelected ? AppColors.darkText : AppColors.greyText,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}
 }
