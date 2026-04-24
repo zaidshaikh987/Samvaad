@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'utils/app_colors.dart'; 
 import 'utils/app_routes.dart'; // Import AppRoutes
 
+// Import services for initialization
+import 'data/database/database_manager.dart';
+import 'services/encryption_service.dart';
+import 'services/user_session.dart';
+
 // Import all screens used in the routes map
 import 'screens/login_screen.dart';
 import 'screens/main_wrapper.dart';
@@ -19,9 +24,7 @@ import 'screens/edit_profile_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/premium_screen.dart';
 import 'screens/rorschach_test_screen.dart';
-import 'screens/therapist_booking_screen.dart';
 import 'pages/help_page.dart'; 
-import 'screens/placeholder_chat_session_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/create_account_screen.dart';
 import 'screens/email_verification_screen.dart';
@@ -79,19 +82,43 @@ class AppRouter {
       AppRoutes.settingsScreen: (context) => const SettingsScreen(),
       AppRoutes.premiumScreen: (context) => const PremiumScreen(),
       AppRoutes.rorschachTestScreen: (context) => const RorschachTestScreen(),
-      AppRoutes.chatSessionPlaceholder: (context) => const PlaceholderChatSessionScreen(), 
     };
   }
 }
 // ----------------------------------------------------
 
 
-void main() {
-  runApp(const SamvaadApp());
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize database (with web support)
+  try {
+    await DatabaseManager().database;
+    print('✅ Database initialized successfully');
+  } catch (e) {
+    print('⚠️ Database initialization warning: $e');
+    // Continue anyway - app can work without database on web
+  }
+  
+  // Initialize encryption service
+  try {
+    await EncryptionService().initialize();
+    print('✅ Encryption service initialized successfully');
+  } catch (e) {
+    print('⚠️ Encryption service warning: $e');
+    // Continue anyway
+  }
+  
+  // Restore user session
+  bool isLoggedIn = await UserSession().restoreSession();
+  
+  runApp(SamvaadApp(isLoggedIn: isLoggedIn));
 }
 
 class SamvaadApp extends StatelessWidget {
-  const SamvaadApp({super.key});
+  final bool isLoggedIn;
+  const SamvaadApp({super.key, this.isLoggedIn = false});
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +192,7 @@ class SamvaadApp extends StatelessWidget {
           hintStyle: const TextStyle(color: AppColors.greyText),
         ),
       ),
-      initialRoute: AppRoutes.welcomeScreen,
+      initialRoute: isLoggedIn ? AppRoutes.mainWrapper : AppRoutes.welcomeScreen,
       // Use the static getter from the AppRouter class
       routes: AppRouter.routes,
     );

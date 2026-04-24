@@ -78,11 +78,99 @@ class _PremiumScreenState extends State<PremiumScreen> {
             const SizedBox(height: 12.0),
 
             // Start Free Trial Button
-            ElevatedButton(
-              onPressed: () {
-                // Handle starting free trial/subscription
-              },
-              child: const Text('Start Free Trial'),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      title: Row(
+                        children: [
+                          const Icon(Icons.workspace_premium_outlined,
+                              color: AppColors.happy),
+                          const SizedBox(width: 8),
+                          const Text('Start Free Trial',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'You\'re starting a 7-day free trial of the '
+                            '${_selectedPlan == 'Annual' ? 'Annual Plan (\$5.99/month)' : 'Monthly Plan (\$9.99/month)'}.',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'No charge until your trial ends. Cancel anytime.',
+                            style: TextStyle(
+                                fontSize: 12, color: AppColors.greyText),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text('Not Now',
+                              style: TextStyle(color: AppColors.greyText)),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Row(
+                                  children: [
+                                    Icon(Icons.check_circle,
+                                        color: Colors.white, size: 18),
+                                    SizedBox(width: 8),
+                                    Text('Free trial activated! Enjoy Samvaad Premium 🎉'),
+                                  ],
+                                ),
+                                backgroundColor: AppColors.primary,
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 3),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary),
+                          child: const Text('Start Trial',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  elevation: 4,
+                  shadowColor: AppColors.primary.withOpacity(0.3),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.star, size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'Start 7-Day Free Trial',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
